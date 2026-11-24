@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; worker-src 'self'; connect-src 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#312e81">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex,nofollow">
+<title>Meu Acordo</title>
+<style>
+:root{--bg:#f1f5fb;--card:#fff;--tx:#0f172a;--mut:#64748b;--ac:#4f46e5;--bd:#e2e8f0;--ok:#16a34a;--wa:#d97706;--er:#dc2626}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#131c2e;--tx:#e8eefc;--mut:#94a3b8;--bd:#25324d}}
+*{box-sizing:border-box;margin:0}
+body{font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);-webkit-text-size-adjust:100%}
+.w{max-width:460px;margin:auto;padding:0 14px 40px}
+.hd{margin:0 -14px;padding:calc(22px + env(safe-area-inset-top)) 18px 56px;background:linear-gradient(135deg,#312e81,#4f46e5 58%,#06b6d4);color:#fff;border-radius:0 0 28px 28px}
+.hd h1{font-size:23px}.hd p{opacity:.85;font-size:14px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;margin-top:12px;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.up{margin-top:-38px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.m{color:var(--mut);font-size:14px}
+.big{font-size:22px;font-weight:800}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:15px;font:inherit;font-weight:700;margin-top:10px;color:#fff;background:var(--ac);cursor:pointer;text-align:center}
+.btn:active{opacity:.85}
+.g{background:#16a34a}.k{background:#0f172a}.o{background:transparent;color:var(--ac);border:1.5px solid var(--bd)}
+.sm{width:auto;margin:0;padding:9px 13px;font-size:15px}
+.due{border-left:7px solid var(--sc)}
+.ok{--sc:var(--ok)}.wa{--sc:var(--wa)}.er{--sc:var(--er)}
+.tag{display:inline-block;background:var(--sc);color:#fff;padding:5px 13px;border-radius:99px;font-size:15px;font-weight:700}
+.r{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;border:1px solid var(--bd);margin-top:8px}
+.r.p{background:rgba(22,163,74,.12);border-color:rgba(22,163,74,.45)}
+.r.v{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.4)}
+.st{font-size:13px;font-weight:700;text-align:right}
+circle.pg{transition:stroke-dashoffset .8s}
+input{width:100%;font:inherit;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);margin-top:4px}
+label{display:block;margin-top:10px;font-size:15px;font-weight:600}
+details{margin-top:12px}summary{cursor:pointer;font-weight:700}
+textarea{width:100%;font:13px monospace;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);height:96px}
+.seal{display:inline-block;border:4px solid #fff;border-radius:14px;padding:8px 16px;font-weight:800;font-size:20px;transform:rotate(-3deg)}
+.q{background:linear-gradient(135deg,#059669,#10b981);color:#fff;text-align:center;border:0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 20px;border-radius:99px;display:none;z-index:9;max-width:90%;text-align:center}
+.lk{background:none;border:0;color:var(--mut);text-decoration:underline;font:inherit;font-size:13px;display:block;margin:22px auto 0;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{.np{display:none!important}body{background:#fff;color:#000}}
+.k2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.kp{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px}.kp b{display:block;font-size:18px}
+.bd{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;background:var(--sc)}
+.k2.up{margin-top:-38px}
+</style>
+</head>
+<body>
+<main id="app" class="w"></main>
+<div id="t" class="toast" role="status"></div>
+<script>
+/*CORE*/
+let NOW=()=>new Date();
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fromIso=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const br=s=>s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4);
+const R=v=>'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const today0=()=>{const t=NOW();return new Date(t.getFullYear(),t.getMonth(),t.getDate())};
+const diasAte=s=>Math.round((fromIso(s)-today0())/864e5);
+const esc=s=>String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+const enc=s=>new TextEncoder().encode(s),hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''),unhex=h=>new Uint8Array((h.match(/../g)||[]).map(x=>parseInt(x,16)));
+const SB=()=>{if(!(globalThis.crypto&&crypto.subtle))throw new Error('nocrypto');return crypto.subtle};
+const sha=async s=>hex(await SB().digest('SHA-256',enc(s)));
+const norm=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+async function kdf(code,n,sl){const k=await SB().importKey('raw',enc(code),'PBKDF2',false,['deriveBits']);
+ return hex(await SB().deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc('acordo|'+sl+'|'+n),iterations:2e5},k,64))}
+function build(q){
+ const t=(s,l)=>String(s||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,l);
+ const T=Math.round(parseFloat(String(q.valor||'').replace(',','.'))*100),n=parseInt(q.parcelas,10),dia=parseInt(q.dia,10);
+ if(!(T>0&&T<=1e9))return{err:'Valor inválido.'};
+ if(!(n>=1&&n<=36))return{err:'Parcelas: de 1 a 36.'};
+ if(!(dia>=1&&dia<=31))return{err:'Dia: de 1 a 31.'};
+ let y,m;
+ if(q.inicio){const k=/^(\d{4})-(\d{1,2})$/.exec(q.inicio);if(!k||+k[2]<1||+k[2]>12||+k[1]<2000||+k[1]>2100)return{err:'Mês inicial inválido.'};y=+k[1];m=+k[2]}
+ else{const d=NOW();y=d.getFullYear();m=d.getMonth()+1;if(dia<d.getDate())m++}
+ const whats=String(q.whats||'').replace(/\D/g,'');
+ if(whats&&(whats.length<10||whats.length>15))return{err:'WhatsApp inválido (DDI+DDD+número).'};
+ const sl=q.sl?String(q.sl):'',bx=q.bx?String(q.bx).split('.'):[];
+ if(sl&&!/^[0-9a-f]{16}$/.test(sl))return{err:'Link inválido.'};
+ if(bx.length&&(!sl||bx.length!==n||bx.some(x=>!/^[0-9a-f]{16}$/.test(x))))return{err:'Códigos do link inválidos.'};
+ const mdia=q.mdia==null||q.mdia===''?50:Math.round(parseFloat(String(q.mdia).replace(',','.'))*100)/100,tol=q.tol==null||q.tol===''?5:parseInt(q.tol,10);
+ if(!(mdia>=0&&mdia<=10000))return{err:'Juros por dia inválido.'};
+ if(!(tol>=0&&tol<=30))return{err:'Tolerância: de 0 a 30 dias.'};
+ const base=Math.floor(T/n),parc=[];
+ for(let i=0;i<n;i++){
+  const last=new Date(y,m+i,0).getDate(),d=new Date(y,m-1+i,Math.min(dia,last));
+  parc.push({n:i+1,venc:iso(d),valor:(i==n-1?T-base*(n-1):base)/100,pagoEm:null,bx:bx[i]||''})}
+ return{nome:t(q.nome,40),credor:t(q.credor,40),total:T/100,dia,pix:t(q.chavepix,80),whats,parc,bem:t(q.bem,60),mdia,tol,sl}}
+function validP(p){const D=/^\d{4}-\d{2}-\d{2}$/;
+ return!!p&&typeof p.total=='number'&&Array.isArray(p.parc)&&p.parc.length>=1&&p.parc.length<=36&&
+ p.parc.every(x=>D.test(x.venc)&&typeof x.valor=='number'&&(!x.pagoEm||D.test(x.pagoEm)))}
+async function planId(p){return(await sha([p.nome,p.credor,p.total,p.dia,p.parc[0].venc,p.parc.length,p.pix,p.whats].concat(p.bem?[p.bem,p.mdia,p.tol]:[]).join('|'))).slice(0,8).toUpperCase()}
+function penhor(p,par){
+ if(!p.bem)return null;
+ const d=-diasAte(par.venc),tol=p.tol,j=d>0?Math.min(d,tol)*p.mdia:0,L=fromIso(par.venc);L.setDate(L.getDate()+tol);
+ return{d,juros:j,total:par.valor+j,estado:d<=0?'ok':d<=tol?'tol':'aband',restam:Math.max(0,tol-d),limite:iso(L)}}
+/*ENDCORE*/
+/*CP*/
+function alerta(d){return d<0?['er','🚨','Atrasada há '+(-d)+' dia'+(d==-1?'':'s')]:d==0?['er','⏰','Vence HOJE']:d<=5?['wa','⚠️','Vence em '+d+' dia'+(d==1?'':'s')]:['ok','✅','Em dia · faltam '+d+' dias']}
+function fold(l){let o='';while(l.length>70){o+=l.slice(0,70)+'\r\n ';l=l.slice(70)}return o+l}
+function icsText(P){
+ const e=s=>String(s).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n');
+ const stamp=NOW().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+ const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Meu Acordo//PT','CALSCALE:GREGORIAN'];
+ P.parc.filter(p=>!p.pagoEm).forEach(p=>{
+  const d=p.venc.replace(/-/g,''),nx=iso(new Date(fromIso(p.venc).getTime()+36e5*30)).replace(/-/g,'');
+  L.push('BEGIN:VEVENT','UID:p'+p.n+'-'+(P.id||'x')+'@meuacordo','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+d,'DTEND;VALUE=DATE:'+nx,
+   'SUMMARY:'+e('Parcela '+p.n+'/'+P.parc.length+' do acordo - '+R(p.valor)),
+   'DESCRIPTION:'+e('Vencimento da parcela do acordo.'+(P.pix?' Chave PIX: '+P.pix:'')),
+   'BEGIN:VALARM','TRIGGER:-PT15H','ACTION:DISPLAY','DESCRIPTION:Amanha vence sua parcela','END:VALARM',
+   'BEGIN:VALARM','TRIGGER:PT9H','ACTION:DISPLAY','DESCRIPTION:Sua parcela vence hoje','END:VALARM','END:VEVENT')});
+ L.push('END:VCALENDAR');return L.map(fold).join('\r\n')}
+/*ENDCP*/
+const K='acordo2',$=id=>document.getElementById(id);
+const ld=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let P=ld(K);if(!validP(P))P=null;
+let fails=0,until=0;
+function toast(m){const t=$('t');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+function copiar(x,m){if(navigator.clipboard&&isSecureContext)navigator.clipboard.writeText(x).then(()=>toast(m));else{const a=document.createElement('textarea');a.value=x;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast(m)}}
+function bloq(){if(Date.now()<until){alert('Muitas tentativas. Aguarde 1 minuto.');return true}return false}
+function falha(){if(++fails>=5){until=Date.now()+6e4;fails=0}}
+const wa=(num,msg)=>window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank','noopener');
+async function lerURL(){
+ const u=new URLSearchParams(location.search);if(!u.get('valor'))return;
+ const np=build(Object.fromEntries(u));history.replaceState(null,'',location.pathname);
+ if(np.err){alert('Link inválido: '+np.err);return}
+ if(P&&!confirm('Já existe um acordo neste aparelho. Substituir pelo novo acordo do link?'))return;
+ np.id=await planId(np);P=np;sv(K,P)}
+const hdr=(t,s)=>'<div class="hd"><h1>'+t+'</h1><p>'+s+'</p></div>';
+const inst=()=>'<details class="c np"><summary>📲 Colocar na tela inicial</summary><p class="m" style="margin-top:8px"><b>iPhone (Safari):</b> Compartilhar → Adicionar à Tela de Início.<br><b>Android (Chrome):</b> menu ⋮ → Adicionar à tela inicial / Instalar app.</p></details>';
+function vazio(){return hdr('Meu Acordo','Acompanhe suas parcelas com segurança')+'<div class="c up" style="text-align:center"><div style="font-size:48px">📄</div><p class="big">Nenhum acordo neste aparelho</p><p class="m">Abra o link que você recebeu pelo WhatsApp.</p></div>'+inst()}
+function ring(p){return'<svg viewBox="0 0 100 100" width="104" height="104"><defs><linearGradient id="gr"><stop offset="0" stop-color="#06b6d4"/><stop offset="1" stop-color="#4f46e5"/></linearGradient></defs><circle cx="50" cy="50" r="42" fill="none" stroke="var(--bd)" stroke-width="10"/><circle class="pg" cx="50" cy="50" r="42" fill="none" stroke="url(#gr)" stroke-width="10" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="'+(264*(1-p/100))+'" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle" font-size="22" font-weight="800" fill="currentColor">'+p+'%</text></svg>'}
+function trust(){return'<p class="m" style="text-align:center;margin-top:14px">🔒 Acordo nº <b>'+esc(P.id||'')+'</b> · seus dados ficam apenas neste aparelho; nada é enviado a servidores.</p>'}
+function quitado(){
+ const rows=P.parc.map(p=>'<div class="r p"><span>Parcela '+p.n+' · pago em '+br(p.pagoEm)+'</span><b>'+R(p.valor)+(p.juros?' + '+R(p.juros)+' juros':'')+'</b></div>').join('');
+ return hdr('Parabéns'+(P.nome?', '+esc(P.nome):'')+'! 🎉','Acordo concluído')+
+ '<div class="c up q"><div style="font-size:52px">🏆</div><div class="seal">DÍVIDA 100% QUITADA ✅</div><p style="margin-top:12px">Você concluiu todas as parcelas. Obrigado pela confiança!</p>'+(P.bem?'<p style="margin-top:8px">Seu bem <b>'+esc(P.bem)+'</b> pode ser retirado com '+esc(P.credor||'o credor')+'.</p>':'')+'</div>'+
+ '<div class="c"><p class="big">🧾 Recibo final</p><p class="m">Acordo nº '+esc(P.id||'')+(P.credor?' · '+esc(P.credor):'')+'</p><p style="margin:8px 0">Total: <b>'+R(P.total)+'</b> em '+P.parc.length+' parcelas</p>'+rows+
+ '<p class="m" style="margin-top:8px">Quitado em '+br(P.parc[P.parc.length-1].pagoEm)+'</p><button class="btn k np" data-a="print">🖨️ Imprimir / salvar PDF</button></div>'}
+function cliente(){
+ if(!P)return vazio();
+ const n=P.parc.length,pg=P.parc.filter(x=>x.pagoEm);if(pg.length==n)return quitado();
+ const pago=pg.reduce((s,x)=>s+x.valor,0),saldo=Math.max(0,P.total-pago),pct=Math.round(pg.length/n*100);
+ const a=P.parc.find(x=>!x.pagoEm),pe=penhor(P,a);let[cl,ic,ms]=alerta(diasAte(a.venc));
+ if(pe&&pe.estado=='tol'){cl='er';ic='🚨';ms='Atraso de '+pe.d+' dia'+(pe.d==1?'':'s')+' · juros '+R(pe.juros)}
+ if(pe&&pe.estado=='aband'){cl='er';ic='⛔';ms='Prazo de tolerância encerrado'}
+ let h=hdr('Olá'+(P.nome?', '+esc(P.nome):'')+'! 👋','Acompanhe seu acordo'+(P.credor?' com '+esc(P.credor):''));
+ h+='<div class="c up row">'+ring(pct)+'<div style="flex:1"><p class="m">Total do acordo</p><p class="big">'+R(P.total)+'</p><p class="m">Pago <b style="color:var(--ok)">'+R(pago)+'</b></p><p class="m">Saldo <b>'+R(saldo)+'</b></p><p class="m">'+pg.length+' de '+n+' parcelas</p></div></div>';
+ if(P.bem)h+='<div class="c row"><div style="font-size:34px">🔐</div><div style="flex:1"><p class="m">Bem em garantia</p><p><b>'+esc(P.bem)+'</b></p><p class="m">Fica em garantia do acordo até a quitação.</p></div></div>';
+ h+='<div class="c due '+cl+'"><span class="tag">'+ic+' '+ms+'</span><p style="margin-top:10px">Parcela <b>'+a.n+'/'+n+'</b> · vence em <b>'+br(a.venc)+'</b></p><p class="big">'+R(a.valor)+'</p>'+
+  (pe?(pe.estado=='ok'?'<p class="m">Pagando até o vencimento você evita juros de '+R(P.mdia)+' por dia de atraso.</p>':pe.estado=='tol'?'<p class="m">Valor atualizado: <b>'+R(pe.total)+'</b> (parcela + juros de '+R(P.mdia)+'/dia). Prazo de tolerância até <b>'+br(pe.limite)+'</b>'+(pe.restam?' (restam '+pe.restam+' dia'+(pe.restam==1?'':'s')+')':' (último dia)')+'; depois, o bem é considerado abandonado, conforme o contrato.</p>':'<p class="m">O bem <b>'+esc(P.bem)+'</b> foi considerado abandonado, conforme o contrato. Entre em contato com o credor.</p>'):'')+
+  (P.pix?'<button class="btn k" data-a="pix">📋 Copiar Chave PIX</button><p class="m" style="word-break:break-all">PIX: '+esc(P.pix)+'</p>':'')+
+  (pe&&pe.estado=='aband'?'':'<button class="btn" data-a="pagar">💸 Já paguei / Confirmar pagamento</button>')+
+  (P.whats?'<button class="btn g" data-a="zap">💬 Enviar comprovante no WhatsApp</button>':'')+'</div>';
+ h+='<button class="btn o np" data-a="ics">🔔 Ativar lembrete no celular</button>';
+ h+='<p class="big" style="margin-top:20px">📅 Parcelas</p>';
+ P.parc.forEach(p=>{const v=!p.pagoEm&&diasAte(p.venc)<0,q=!p.pagoEm&&penhor(P,p);
+  h+='<div class="r'+(p.pagoEm?' p':v?' v':'')+'"><div><b>Parcela '+p.n+'/'+n+'</b><div class="m">'+br(p.venc)+'</div><b>'+R(p.valor)+'</b>'+(p.juros?'<div class="m">+ juros '+R(p.juros)+'</div>':'')+'</div><div class="st">'+(p.pagoEm?'PAGO ✅<br><span class="m">'+br(p.pagoEm)+'</span>':q&&q.estado=='aband'?'ABANDONADO ⛔':v?'VENCIDA 🔴'+(q?'<br><span class="m">juros '+R(q.juros)+'</span>':''):'AGUARDANDO ⏳')+'</div></div>'});
+ if(P.whats)h+='<button class="btn o np" data-a="fale">💬 Falar com '+esc(P.credor||'o credor')+'</button>';
+ return h+trust()+inst()}
+function render(){$('app').innerHTML=cliente()}
+const A={
+ async pagar(){const p=P.parc.find(x=>!x.pagoEm);if(!p||bloq())return;const pe=penhor(P,p);
+  if(pe&&pe.estado=='aband'){alert('O prazo de tolerância terminou. Fale com '+(P.credor||'o credor')+' para tratar do bem.');return}
+  if(p.bx){const c=prompt('Digite o código de baixa que '+(P.credor||'o credor')+' enviou após receber seu pagamento:');if(c===null)return;
+   toast('Verificando...');
+   if(await kdf(norm(c),p.n,P.sl)!==p.bx){falha();alert('Código incorreto.');return}}
+  else if(!confirm('Confirma que já pagou a parcela '+p.n+'/'+P.parc.length+' ('+R(pe&&pe.juros?pe.total:p.valor)+')?'))return;
+  if(pe&&pe.juros)p.juros=pe.juros;p.pagoEm=iso(new Date());sv(K,P);render();scrollTo(0,0);toast(P.parc.every(x=>x.pagoEm)?'🎉 Quitado!':'Pagamento registrado ✅')},
+ pix(){copiar(P.pix,'Chave PIX copiada!')},
+ zap(){const p=P.parc.find(x=>!x.pagoEm),pe=penhor(P,p);wa(P.whats,'Olá'+(P.credor?', '+P.credor:'')+'! Acabei de pagar a parcela '+p.n+'/'+P.parc.length+' referente ao dia '+P.dia+'.'+(pe&&pe.juros?' Valor com juros: '+R(pe.total)+'.':'')+' Acordo #'+P.id+'.')},
+ fale(){wa(P.whats,'Olá! Sobre o acordo #'+P.id+':')},
+ ics(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([icsText(P)],{type:'text/calendar'}));a.download='parcelas.ics';document.body.appendChild(a);a.click();a.remove();toast('Abra o arquivo para adicionar ao calendário')},
+ print(){print()}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a])A[b.dataset.a](b)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+(async()=>{try{await lerURL();if(P&&!P.id){P.id=await planId(P);sv(K,P)}render()}catch(e){$('app').innerHTML='<div class="c" style="margin-top:30px"><p class="big">Navegador sem suporte</p><p class="m">Abra este link pelo endereço https no Chrome ou Safari atualizados.</p></div>'}})();
+if('serviceWorker'in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+</script>
+</body>
+</html>

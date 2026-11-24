@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; connect-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#312e81">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex,nofollow">
+<title>Painel do Credor</title>
+<style>
+:root{--bg:#f1f5fb;--card:#fff;--tx:#0f172a;--mut:#64748b;--ac:#4f46e5;--bd:#e2e8f0;--ok:#16a34a;--wa:#d97706;--er:#dc2626}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#131c2e;--tx:#e8eefc;--mut:#94a3b8;--bd:#25324d}}
+*{box-sizing:border-box;margin:0}
+body{font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);-webkit-text-size-adjust:100%}
+.w{max-width:460px;margin:auto;padding:0 14px 40px}
+.hd{margin:0 -14px;padding:calc(22px + env(safe-area-inset-top)) 18px 56px;background:linear-gradient(135deg,#312e81,#4f46e5 58%,#06b6d4);color:#fff;border-radius:0 0 28px 28px}
+.hd h1{font-size:23px}.hd p{opacity:.85;font-size:14px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px;margin-top:12px;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.up{margin-top:-38px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.m{color:var(--mut);font-size:14px}
+.big{font-size:22px;font-weight:800}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:15px;font:inherit;font-weight:700;margin-top:10px;color:#fff;background:var(--ac);cursor:pointer;text-align:center}
+.btn:active{opacity:.85}
+.g{background:#16a34a}.k{background:#0f172a}.o{background:transparent;color:var(--ac);border:1.5px solid var(--bd)}
+.sm{width:auto;margin:0;padding:9px 13px;font-size:15px}
+.due{border-left:7px solid var(--sc)}
+.ok{--sc:var(--ok)}.wa{--sc:var(--wa)}.er{--sc:var(--er)}
+.tag{display:inline-block;background:var(--sc);color:#fff;padding:5px 13px;border-radius:99px;font-size:15px;font-weight:700}
+.r{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-radius:14px;border:1px solid var(--bd);margin-top:8px}
+.r.p{background:rgba(22,163,74,.12);border-color:rgba(22,163,74,.45)}
+.r.v{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.4)}
+.st{font-size:13px;font-weight:700;text-align:right}
+circle.pg{transition:stroke-dashoffset .8s}
+input{width:100%;font:inherit;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);margin-top:4px}
+label{display:block;margin-top:10px;font-size:15px;font-weight:600}
+details{margin-top:12px}summary{cursor:pointer;font-weight:700}
+textarea{width:100%;font:13px monospace;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);height:96px}
+.seal{display:inline-block;border:4px solid #fff;border-radius:14px;padding:8px 16px;font-weight:800;font-size:20px;transform:rotate(-3deg)}
+.q{background:linear-gradient(135deg,#059669,#10b981);color:#fff;text-align:center;border:0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 20px;border-radius:99px;display:none;z-index:9;max-width:90%;text-align:center}
+.lk{background:none;border:0;color:var(--mut);text-decoration:underline;font:inherit;font-size:13px;display:block;margin:22px auto 0;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{.np{display:none!important}body{background:#fff;color:#000}}
+.k2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.kp{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px}.kp b{display:block;font-size:18px}
+.bd{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;background:var(--sc)}
+.k2.up{margin-top:-38px}
+</style>
+</head>
+<body>
+<main id="app" class="w"></main>
+<div id="t" class="toast" role="status"></div>
+<script>
+/*CORE*/
+let NOW=()=>new Date();
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fromIso=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const br=s=>s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4);
+const R=v=>'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const today0=()=>{const t=NOW();return new Date(t.getFullYear(),t.getMonth(),t.getDate())};
+const diasAte=s=>Math.round((fromIso(s)-today0())/864e5);
+const esc=s=>String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+const enc=s=>new TextEncoder().encode(s),hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''),unhex=h=>new Uint8Array((h.match(/../g)||[]).map(x=>parseInt(x,16)));
+const SB=()=>{if(!(globalThis.crypto&&crypto.subtle))throw new Error('nocrypto');return crypto.subtle};
+const sha=async s=>hex(await SB().digest('SHA-256',enc(s)));
+const norm=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+async function kdf(code,n,sl){const k=await SB().importKey('raw',enc(code),'PBKDF2',false,['deriveBits']);
+ return hex(await SB().deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc('acordo|'+sl+'|'+n),iterations:2e5},k,64))}
+function build(q){
+ const t=(s,l)=>String(s||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,l);
+ const T=Math.round(parseFloat(String(q.valor||'').replace(',','.'))*100),n=parseInt(q.parcelas,10),dia=parseInt(q.dia,10);
+ if(!(T>0&&T<=1e9))return{err:'Valor inválido.'};
+ if(!(n>=1&&n<=36))return{err:'Parcelas: de 1 a 36.'};
+ if(!(dia>=1&&dia<=31))return{err:'Dia: de 1 a 31.'};
+ let y,m;
+ if(q.inicio){const k=/^(\d{4})-(\d{1,2})$/.exec(q.inicio);if(!k||+k[2]<1||+k[2]>12||+k[1]<2000||+k[1]>2100)return{err:'Mês inicial inválido.'};y=+k[1];m=+k[2]}
+ else{const d=NOW();y=d.getFullYear();m=d.getMonth()+1;if(dia<d.getDate())m++}
+ const whats=String(q.whats||'').replace(/\D/g,'');
+ if(whats&&(whats.length<10||whats.length>15))return{err:'WhatsApp inválido (DDI+DDD+número).'};
+ const sl=q.sl?String(q.sl):'',bx=q.bx?String(q.bx).split('.'):[];
+ if(sl&&!/^[0-9a-f]{16}$/.test(sl))return{err:'Link inválido.'};
+ if(bx.length&&(!sl||bx.length!==n||bx.some(x=>!/^[0-9a-f]{16}$/.test(x))))return{err:'Códigos do link inválidos.'};
+ const mdia=q.mdia==null||q.mdia===''?50:Math.round(parseFloat(String(q.mdia).replace(',','.'))*100)/100,tol=q.tol==null||q.tol===''?5:parseInt(q.tol,10);
+ if(!(mdia>=0&&mdia<=10000))return{err:'Juros por dia inválido.'};
+ if(!(tol>=0&&tol<=30))return{err:'Tolerância: de 0 a 30 dias.'};
+ const base=Math.floor(T/n),parc=[];
+ for(let i=0;i<n;i++){
+  const last=new Date(y,m+i,0).getDate(),d=new Date(y,m-1+i,Math.min(dia,last));
+  parc.push({n:i+1,venc:iso(d),valor:(i==n-1?T-base*(n-1):base)/100,pagoEm:null,bx:bx[i]||''})}
+ return{nome:t(q.nome,40),credor:t(q.credor,40),total:T/100,dia,pix:t(q.chavepix,80),whats,parc,bem:t(q.bem,60),mdia,tol,sl}}
+function validP(p){const D=/^\d{4}-\d{2}-\d{2}$/;
+ return!!p&&typeof p.total=='number'&&Array.isArray(p.parc)&&p.parc.length>=1&&p.parc.length<=36&&
+ p.parc.every(x=>D.test(x.venc)&&typeof x.valor=='number'&&(!x.pagoEm||D.test(x.pagoEm)))}
+async function planId(p){return(await sha([p.nome,p.credor,p.total,p.dia,p.parc[0].venc,p.parc.length,p.pix,p.whats].concat(p.bem?[p.bem,p.mdia,p.tol]:[]).join('|'))).slice(0,8).toUpperCase()}
+function penhor(p,par){
+ if(!p.bem)return null;
+ const d=-diasAte(par.venc),tol=p.tol,j=d>0?Math.min(d,tol)*p.mdia:0,L=fromIso(par.venc);L.setDate(L.getDate()+tol);
+ return{d,juros:j,total:par.valor+j,estado:d<=0?'ok':d<=tol?'tol':'aband',restam:Math.max(0,tol-d),limite:iso(L)}}
+/*ENDCORE*/
+/*PP*/
+const c2=x=>Math.round(x*100)/100;
+const AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const genCode=()=>[...crypto.getRandomValues(new Uint8Array(8))].map(x=>AL[x&31]).join('');
+const fmt=c=>c.slice(0,4)+'-'+c.slice(4);
+function lembreteMsg(pl,id,p){const d=diasAte(p.venc),pe=penhor(pl,p),B=pl.nome?', '+pl.nome:'',N=pl.parc.length,pix=pl.pix?' Chave PIX: '+pl.pix+'.':'',tail=' Acordo #'+id+'.';
+ if(pe){
+  if(pe.estado=='ok')return'Olá'+B+'! Lembrete: a parcela '+p.n+'/'+N+' ('+R(p.valor)+') '+(d==0?'vence hoje':'vence em '+br(p.venc))+'. O seu bem ('+pl.bem+') segue em garantia do acordo. Pagando até o vencimento, você evita os juros de '+R(pl.mdia)+' por dia de atraso, conforme combinado.'+pix+' Se já pagou, envie o comprovante.'+tail;
+  if(pe.estado=='tol')return'Olá'+B+'! A parcela '+p.n+'/'+N+' venceu em '+br(p.venc)+' e está com '+pe.d+' dia'+(pe.d==1?'':'s')+' de atraso. Conforme combinado, incidem juros de '+R(pl.mdia)+' por dia: '+R(pe.juros)+' até hoje (valor atualizado: '+R(pe.total)+'). O prazo de tolerância vai até '+br(pe.limite)+' ('+(pe.restam?'restam '+pe.restam+' dia'+(pe.restam==1?'':'s'):'último dia')+'); depois disso, o bem ('+pl.bem+') será considerado abandonado, nos termos do contrato.'+pix+' Se já pagou, envie o comprovante.'+tail;
+  return'Olá'+B+'. O prazo de tolerância da parcela '+p.n+'/'+N+' terminou em '+br(pe.limite)+' sem o pagamento. Conforme o contrato, o bem ('+pl.bem+') passa a ser considerado abandonado. Se quiser tratar de uma solução, responda esta mensagem.'+tail}
+ return'Olá'+B+'! Passando para lembrar, com todo o respeito, que a parcela '+p.n+'/'+N+' do nosso acordo ('+R(p.valor)+') '+(d<0?'venceu em '+br(p.venc):d==0?'vence hoje':'vence em '+br(p.venc))+'.'+pix+' Se já pagou, desconsidere e me envie o comprovante.'+tail}
+function statusE(e){const pl=build(e.q);if(pl.err)return{ord:9,txt:'Inválido',cls:'er',nx:-1};
+ const nx=pl.parc.findIndex((p,j)=>!e.paid[j]);if(nx<0)return{ord:5,txt:'Quitado ✅',cls:'ok',nx};
+ const p=pl.parc[nx],d=diasAte(p.venc),pe=penhor(pl,p);
+ if(pe&&pe.estado=='aband')return{ord:0,txt:'Abandonado ⛔',cls:'er',nx};
+ if(d<0)return{ord:1,txt:'Atrasado '+(-d)+'d'+(pe?' · juros '+R(pe.juros):''),cls:'er',nx};
+ if(d<=5)return{ord:2,txt:d==0?'Vence hoje':'Vence em '+d+'d',cls:'wa',nx};
+ return{ord:3,txt:'Em dia',cls:'ok',nx}}
+function resumo(cl){let tot=0,rec=0,jrec=0,ab=0,atr=0,jac=0,nA=0,nB=0;
+ cl.forEach(e=>{const pl=build(e.q);if(pl.err)return;tot+=pl.total;let a=false,b=false;
+  pl.parc.forEach((p,j)=>{if(e.paid[j]){rec+=p.valor;jrec+=e.jur[j]||0}else{ab+=p.valor;if(diasAte(p.venc)<0){atr+=p.valor;a=true;const pe=penhor(pl,p);if(pe){jac+=pe.juros;if(pe.estado=='aband')b=true}}}});
+  if(a)nA++;if(b)nB++});
+ return{n:cl.length,tot:c2(tot),rec:c2(rec),jrec:c2(jrec),ab:c2(ab),atr:c2(atr),jac:c2(jac),nA,nB}}
+function mkLink(base,e){const qs=new URLSearchParams();for(const k in e.q)if(e.q[k]!==''&&e.q[k]!=null)qs.set(k,e.q[k]);
+ if(e.bx&&e.bx.length){qs.set('sl',e.sl);qs.set('bx',e.bx.join('.'))}return base+'?'+qs}
+function csv(cl){const C=x=>{let s=String(x==null?'':x);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return/[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s},M=v=>v.toFixed(2).replace('.',',');
+ const L=['Cliente;Bem;Parcela;Vencimento;Valor;Situação;Recebido em;Juros recebidos'];
+ cl.forEach(e=>{const pl=build(e.q);if(pl.err)return;pl.parc.forEach((p,j)=>L.push([C(pl.nome),C(pl.bem),p.n+'/'+pl.parc.length,br(p.venc),M(p.valor),e.paid[j]?'Recebida':diasAte(p.venc)<0?'Atrasada':'Em aberto',e.paid[j]&&e.pd[j]?br(e.pd[j]):'',M(e.jur[j]||0)].join(';')))});
+ return L.join('\r\n')}
+/*ENDPP*/
+/*VAULT*/
+const VK='vault3';let key=null,D=null,vs=null;
+const ld=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+async function derive(pass,saltHex){const k=await SB().importKey('raw',enc(pass),'PBKDF2',false,['deriveKey']);
+ return SB().deriveKey({name:'PBKDF2',hash:'SHA-256',salt:unhex(saltHex),iterations:3e5},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function persist(){const iv=crypto.getRandomValues(new Uint8Array(12));
+ const c=await SB().encrypt({name:'AES-GCM',iv},key,enc(JSON.stringify(D)));
+ localStorage.setItem(VK,JSON.stringify({v:3,s:vs,iv:hex(iv),c:hex(c)}))}
+async function abrir(pass){const V=ld(VK);if(!V||!/^[0-9a-f]+$/.test(V.s||'')||!/^[0-9a-f]+$/.test(V.c||''))return false;
+ try{const k=await derive(pass,V.s),p=await SB().decrypt({name:'AES-GCM',iv:unhex(V.iv)},k,unhex(V.c)),d=JSON.parse(new TextDecoder().decode(p));
+  if(!d||!Array.isArray(d.cl))return false;key=k;vs=V.s;D=d;return true}catch(e){return false}}
+async function criar(pass){vs=hex(crypto.getRandomValues(new Uint8Array(16)));key=await derive(pass,vs);D={cl:[]};await persist()}
+function trancar(){D=null;key=null}
+/*ENDVAULT*/
+const $=id=>document.getElementById(id);
+let view='main',fails=0,until=0,idle=0,hideT=0;
+function toast(m){const t=$('t');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+function copiar(x,m){if(navigator.clipboard&&isSecureContext)navigator.clipboard.writeText(x).then(()=>toast(m)).catch(()=>toast('Pronto. Use o botão Copiar link do cliente.'));else{const a=document.createElement('textarea');a.value=x;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast(m)}}
+function bloq(){if(Date.now()<until){alert('Muitas tentativas. Aguarde 1 minuto.');return true}return false}
+function falha(){if(++fails>=5){until=Date.now()+6e4;fails=0}}
+const wa=(num,msg)=>window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank','noopener');
+const baseUrl=()=>location.href.split(/[?#]/)[0].replace(/[^/]*$/,'')+'index.html';
+const hdr=(t,s,x)=>'<div class="hd"><div class="row"><div><h1>'+t+'</h1><p>'+s+'</p></div>'+(x||'')+'</div></div>';
+const inp=(id,l,ph,t,x)=>'<label>'+l+'<input id="'+id+'" type="'+(t||'text')+'" placeholder="'+ph+'" '+(x||'')+'></label>';
+const dl=(nome,txt,tipo)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:tipo}));a.download=nome;document.body.appendChild(a);a.click();a.remove()};
+async function save(){await persist();render()}
+function lockView(){const novo=!ld(VK);
+ return hdr('🔐 Painel do Credor','Seus clientes e valores ficam só neste aparelho, criptografados')+'<div class="c up">'+
+ (novo?'<p class="big">Crie sua frase-senha</p><p class="m">Mínimo 8 caracteres. Não existe recuperação: se esquecer, só o backup salva.</p>'+inp('p1','Frase-senha','','password','autocomplete="new-password"')+inp('p2','Repita','','password','autocomplete="new-password"')+'<button class="btn" data-a="setup">Criar cofre</button>'
+ :'<p class="big">Entrar</p>'+inp('p1','Frase-senha','','password','autocomplete="current-password"')+'<button class="btn" data-a="unlock">Abrir</button>')+
+ '<details><summary>Restaurar backup</summary><p class="m" style="margin:8px 0">Substitui o cofre deste aparelho. Depois, entre com a frase-senha do backup.</p><input id="bk" type="file" accept=".json,application/json"></details></div>'}
+function main(){
+ const cl=D.cl,r=resumo(cl),base=baseUrl();let due='',list='';
+ cl.map((e,i)=>[i,statusE(e)]).sort((a,b)=>a[1].ord-b[1].ord).forEach(([i,s])=>{
+  const e=cl[i],pl=build(e.q);if(pl.err)return;const nm=esc(pl.nome||'Cliente'),p=s.nx>=0?pl.parc[s.nx]:null;
+  if(p&&e.wcli&&diasAte(p.venc)<=3)due+='<div class="r"><div><b>'+nm+'</b><div class="m">Parc. '+(s.nx+1)+'/'+pl.parc.length+' · '+br(p.venc)+' · '+R(p.valor)+'</div></div><button class="btn g sm" data-a="lem" data-i="'+i+'">💬 Lembrar</button></div>';
+  const pago=c2(pl.parc.reduce((t,x,j)=>t+(e.paid[j]?x.valor:0),0));
+  list+='<details class="c"><summary><b>'+nm+'</b> <span class="bd '+s.cls+'">'+s.txt+'</span></summary>'+
+   '<p class="m" style="margin-top:8px">Acordo #'+esc(e.id)+' · total '+R(pl.total)+' · recebido '+R(pago)+' · saldo '+R(c2(pl.total-pago))+(pl.bem?'<br>🔐 '+esc(pl.bem)+' · '+R(pl.mdia)+'/dia · tolerância '+pl.tol+'d':'')+'</p>'+
+   pl.parc.map((x,j)=>'<div class="r'+(e.paid[j]?' p':'')+'"><div>'+(j+1)+'. '+br(x.venc)+' · '+R(x.valor)+'<div class="m">'+(e.codes[j]?'Código de baixa: <b>'+esc(fmt(e.codes[j]))+'</b>':'')+(e.paid[j]&&e.jur[j]?' · juros '+R(e.jur[j]):'')+'</div></div><button class="btn o sm" data-a="rec" data-i="'+i+'" data-j="'+j+'">'+(e.paid[j]?'Desfazer':'Recebida')+'</button></div>').join('')+
+   '<button class="btn o" data-a="copylink" data-i="'+i+'">🔗 Copiar link do cliente</button>'+(e.wcli?'<button class="btn g" data-a="sendlink" data-i="'+i+'">📤 Enviar link ao cliente (WhatsApp)</button>':'')+
+   '<button class="btn o" data-a="del" data-i="'+i+'">Excluir cliente</button></details>'});
+ const K=(l,v,x)=>'<div class="kp"><span class="m">'+l+'</span><b'+(x?' style="color:var(--'+x+')"':'')+'>'+v+'</b></div>';
+ return hdr('📊 Painel','Controle de clientes e valores','<button class="btn o sm np" style="color:#fff;border-color:#fff7" data-a="lock">🔒 Trancar</button>')+
+ '<div class="k2 up">'+K('Clientes',r.n+(r.nA?' · '+r.nA+' em atraso':''))+K('Total contratado',R(r.tot))+K('Recebido',R(r.rec+r.jrec),'ok')+K('A receber',R(r.ab))+K('Em atraso',R(r.atr),r.atr?'er':'')+K('Juros acumulados',R(r.jac),r.jac?'wa':'')+'</div>'+
+ (r.nB?'<div class="c due er"><b>⛔ '+r.nB+' cliente'+(r.nB==1?'':'s')+' com bem além do prazo de tolerância</b></div>':'')+
+ '<div class="c"><p class="big">⏰ Lembrar agora</p>'+(due||'<p class="m">Nenhuma parcela vencendo em até 3 dias ou atrasada (com WhatsApp do cliente cadastrado).</p>')+'<p class="m" style="margin-top:8px">Envie lembretes só a quem concordou em recebê-los, em horário comercial e com respeito.</p></div>'+
+ '<div class="c"><details'+(cl.length?'':' open')+'><summary class="big">➕ Novo cliente</summary>'+inp('f_nome','Nome do cliente','João')+inp('f_cred','Seu nome / empresa (aparece ao cliente)','Maria Silva')+
+  inp('f_valor','Valor total (R$)','1000','number','inputmode="decimal" step="0.01"')+inp('f_parc','Parcelas (1 a 36)','5','number','inputmode="numeric"')+
+  inp('f_dia','Dia do vencimento (1 a 31)','10','number','inputmode="numeric"')+inp('f_ini','Mês da 1ª parcela','','month')+
+  inp('f_pix','Chave PIX (opcional, o cliente verá)','CPF, e-mail, telefone ou aleatória')+inp('f_whats','Seu WhatsApp (opcional, o cliente verá)','5511999999999','tel','inputmode="numeric"')+
+  inp('f_wcli','WhatsApp do cliente (fica só aqui, nunca vai no link)','5511988887777','tel','inputmode="numeric"')+
+  '<details><summary>🔐 Bem em garantia (penhor)</summary>'+inp('f_bem','Bem empenhado','Notebook Dell, nº de série...')+inp('f_mdia','Juros por dia de atraso (R$)','50','number','inputmode="decimal" value="50"')+inp('f_tol','Dias de tolerância','5','number','inputmode="numeric" value="5"')+'</details>'+
+  '<label style="display:flex;gap:8px;align-items:center"><input id="f_ex" type="checkbox" checked style="width:auto;margin:0"> Exigir código de baixa por parcela</label>'+
+  '<button class="btn" data-a="gerar">Cadastrar e gerar link</button></details></div>'+
+ '<p class="big" style="margin-top:18px">👥 Clientes</p>'+(list||'<p class="m">Nenhum ainda.</p>')+
+ '<div class="c np"><p class="big">🛠️ Ferramentas</p><button class="btn o" data-a="backup">💾 Backup criptografado</button><button class="btn o" data-a="csvx">📑 Exportar planilha (CSV)</button><button class="btn o" data-a="trocar">🔑 Trocar frase-senha</button><p class="m" style="margin-top:8px">Faça backup com frequência: se o navegador limpar os dados, o cofre se perde. O CSV sai sem criptografia; guarde com cuidado.</p></div>'}
+function render(){$('app').innerHTML=D?main():lockView()}
+function lock(){trancar();render()}
+const touch=()=>{clearTimeout(idle);if(D)idle=setTimeout(lock,3e5)};
+const A={
+ async setup(){const a=$('p1').value,b=$('p2').value;if(a.length<8){alert('Use pelo menos 8 caracteres.');return}if(a!==b){alert('As frases não conferem.');return}
+  toast('Criando cofre...');await criar(a);render();touch()},
+ async unlock(){if(bloq())return;toast('Abrindo...');if(await abrir($('p1').value)){render();touch()}else{falha();alert('Frase-senha incorreta.')}},
+ lock(){lock()},
+ async gerar(){const g=id=>$(id).value.trim();
+  const q={nome:g('f_nome'),credor:g('f_cred'),valor:g('f_valor'),parcelas:g('f_parc'),dia:g('f_dia'),inicio:g('f_ini'),chavepix:g('f_pix'),whats:g('f_whats'),bem:g('f_bem'),mdia:g('f_mdia'),tol:g('f_tol')};
+  if(!q.bem){delete q.mdia;delete q.tol}
+  const pl=build(q);if(pl.err){alert(pl.err);return}
+  const codes=[],bx=[],sl=hex(crypto.getRandomValues(new Uint8Array(8)));
+  if($('f_ex').checked){toast('Gerando códigos seguros...');for(let i=0;i<pl.parc.length;i++){const c=genCode();codes.push(c);bx.push(await kdf(c,i+1,sl))}}
+  const e={id:await planId(pl),q,wcli:g('f_wcli').replace(/\D/g,''),codes,sl,bx,paid:pl.parc.map(()=>false),pd:pl.parc.map(()=>null),jur:pl.parc.map(()=>0),cr:iso(NOW())};
+  D.cl.unshift(e);await save();copiar(mkLink(baseUrl(),e),'Cliente cadastrado · link copiado!')},
+ copylink(b){copiar(mkLink(baseUrl(),D.cl[+b.dataset.i]),'Link copiado!')},
+ sendlink(b){const e=D.cl[+b.dataset.i],pl=build(e.q);wa(e.wcli,'Olá'+(pl.nome?', '+pl.nome:'')+'! Aqui está o link para acompanhar seu acordo e suas parcelas: '+mkLink(baseUrl(),e))},
+ lem(b){const e=D.cl[+b.dataset.i],pl=build(e.q),s=statusE(e);if(s.nx>=0)wa(e.wcli,lembreteMsg(pl,e.id,pl.parc[s.nx]))},
+ rec(b){const e=D.cl[+b.dataset.i],j=+b.dataset.j;
+  if(e.paid[j]){e.paid[j]=false;e.pd[j]=null;e.jur[j]=0}
+  else{const pl=build(e.q),pe=penhor(pl,pl.parc[j]);let jr=0;if(pe&&pe.juros>0){const v=prompt('Juros recebidos nesta parcela (R$):',String(pe.juros));if(v===null)return;jr=c2(parseFloat(String(v).replace(',','.'))||0)}
+   e.paid[j]=true;e.pd[j]=iso(NOW());e.jur[j]=jr}
+  save()},
+ del(b){if(!confirm('Excluir este cliente e todo o histórico dele?'))return;D.cl.splice(+b.dataset.i,1);save()},
+ backup(){const v=localStorage.getItem(VK);if(!v)return;dl('backup-acordos-'+iso(NOW())+'.json',v,'application/json');toast('Backup salvo (criptografado)')},
+ csvx(){if(!confirm('A planilha sai SEM criptografia. Continuar?'))return;dl('clientes-'+iso(NOW())+'.csv','\ufeff'+csv(D.cl),'text/csv')},
+ async trocar(){const s=prompt('Nova frase-senha (mínimo 8 caracteres):');if(!s||s.length<8)return;vs=hex(crypto.getRandomValues(new Uint8Array(16)));key=await derive(s,vs);await persist();toast('Frase-senha trocada. Faça um novo backup.')}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a])A[b.dataset.a](b)});
+document.addEventListener('change',e=>{if(e.target.id!='bk'||!e.target.files[0])return;const f=e.target.files[0];if(f.size>5e6){alert('Arquivo grande demais.');return}
+ const r=new FileReader();r.onload=()=>{try{const V=JSON.parse(r.result);if(V.v!==3||!/^[0-9a-f]+$/.test(V.s)||!/^[0-9a-f]{24}$/.test(V.iv)||!/^[0-9a-f]+$/.test(V.c))throw 0;
+  if(!confirm('Substituir o cofre deste aparelho pelo backup?'))return;localStorage.setItem(VK,JSON.stringify({v:3,s:V.s,iv:V.iv,c:V.c}));trancar();render();toast('Backup restaurado. Entre com a frase-senha.')}catch(x){alert('Arquivo de backup inválido.')}};r.readAsText(f)});
+['click','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,touch,{passive:true}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&D)hideT=setTimeout(lock,6e4);else clearTimeout(hideT)});
+try{SB();render()}catch(e){$('app').innerHTML='<div class="c" style="margin-top:30px"><p class="big">Navegador sem suporte</p><p class="m">Abra pelo endereço https no Chrome ou Safari atualizados.</p></div>'}
+
+</script>
+</body>
+</html>
